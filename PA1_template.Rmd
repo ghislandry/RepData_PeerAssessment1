@@ -29,8 +29,8 @@ Data <- subset(data,complete.cases(data)==TRUE)
 ## What is mean total number of steps taken per day?
 ```{r, echo=TRUE}
 
-# split the data by date and count in dailySteps 
-# count the number of steps for each day
+# split the data by date and   
+# count the number of steps taken for each day
 StepsPerday<-sapply(split(Data,Data$date, drop=TRUE) 
                    , function(x) sum(x$steps)) 
 # plot the histogram
@@ -59,7 +59,7 @@ Time series plot of the 5-minute interval (x-axis) and the average number of ste
 StepsPerIntervals<-sapply(split(Data,Data$interval, drop=TRUE) 
                    , function(x) mean(x$steps)) 
 
-plot(StepsPerIntervals, type="l", main = "Daily Average Activity Pattern",
+plot(StepsPerIntervals, type="l", main = "Average Daily Activity Pattern",
      ylab = "Average Number of steps", xlab = "Intervals", col = "red")
         abline(v=which.max(StepsPerIntervals), lty=3, col="blue") 
         text(which.max(StepsPerIntervals),max(StepsPerIntervals),  
@@ -71,7 +71,7 @@ plot(StepsPerIntervals, type="l", main = "Daily Average Activity Pattern",
 
 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps? 
 
-As shown in the code bellow, it is nterval whose name is <b>835</b>, its average number of steps is <b>206</b>, and that interval is the <b>104 th</b> interval . 
+As shown in the code bellow, it is the interval whose name is <b>835</b>, it has <b>206</b> steps on average, and the corresponding interval is the interval number <b>104 th</b>. 
 
 
 ```{r, echo=TRUE}
@@ -108,7 +108,7 @@ splitNewData <- split(data.combined, data.combined$rawData, drop=TRUE)
 
 # Now for each row in the split data wher rawDatais FALSE
 # replace NA with the interval average 
-# 
+# We use the step per interval that we already calculated 
 
 for (row in 1:nrow(splitNewData[["FALSE"]])){  
     splitNewData[["FALSE"]][row,1] <- round(subset(StepsPerIntervals,names(StepsPerIntervals) ==
@@ -116,20 +116,20 @@ for (row in 1:nrow(splitNewData[["FALSE"]])){
 }
 
 # splitNewData is a list that contains two data frames named respectively, TRUE 
-# and FALSE. The false data frame contains imputed average number of steps for the missing 5 
+# and FALSE. The FALSE data frame contains imputed average number of steps for the missing 5 
 # interval.
-# The TRUE data frame contains the original data
+# The TRUE data frame contains the raw data without missing values
 
 # Put the data back in chronologcal order
 newData <- rbind(splitNewData[["FALSE"]],splitNewData[["TRUE"]])
 newData <- newData[with(newData, order(date, interval)), ]   
-
-head(newData)
 # Imputation done
+head(newData)
+
 ```
 
 
-Histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? 
+Plot the histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? 
 
 ```{r, echo=TRUE}
 
@@ -189,6 +189,10 @@ rug(StepsPerday, col="blue")
 
 Let us create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 
+```{r, echo=TRUE, results='hide', message=FALSE}
+        require(lattice) # Since we will latter use the qplot function from the lattice package letter 
+```
+
 
 ```{r, echo=TRUE}
 newData$date <- as.Date(strptime(newData$date, format="%Y-%m-%d"))
@@ -212,7 +216,6 @@ names(stepsByDay) <- c("interval", "day", "steps")
 
 par(mfrow=c(1,1))
 
-require(lattice)
 
 StepsPerIntervals<-sapply(split(newData,newData$interval, drop=TRUE) 
                    , function(x) mean(x$steps)) 
